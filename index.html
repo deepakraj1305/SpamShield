@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SpamShield — machine-learning powered message spam screening demo.">
+  <title>SpamShield — Smart Message Protection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <header class="topbar wrap">
+    <a class="brand" href="/" aria-label="SpamShield home"><span class="brand-mark">S</span><span>Spam<span class="brand-accent">Shield</span><small>MESSAGE INTELLIGENCE</small></span></a>
+    <div class="status"><span class="pulse"></span> ML ENGINE READY</div>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow"><span class="eyebrow-line"></span> YOUR FIRST LINE OF DEFENCE</div>
+      <h1>Read between<br>the <span>red flags.</span></h1>
+      <p class="hero-copy">Screen suspicious messages in seconds. SpamShield uses natural language processing and machine learning to estimate whether a message looks like spam or a legitimate conversation.</p>
+      <div class="hero-pills"><span>✳ NLP ANALYSIS</span><span>◈ TF-IDF VECTORS</span><span>⌁ NAIVE BAYES</span></div>
+    </section>
+    <section class="workspace">
+      <div class="panel input-panel">
+        <div class="panel-head"><div><div class="section-kicker">01 / INPUT</div><h2>Inspect a message</h2></div><span class="step-icon">↗</span></div>
+        <p class="muted">Paste an SMS, notification, or short email below.</p>
+        <form method="post" id="scan-form">
+          <label for="message">MESSAGE CONTENT</label>
+          <textarea id="message" name="message" maxlength="5000" placeholder="e.g. Congratulations! You have won a prize. Click here to claim..." required>{{ message }}</textarea>
+          <div class="field-foot"><span id="char-count">0 / 5000 characters</span><button class="text-button" type="button" id="clear-btn">Clear text ↗</button></div>
+          <div class="examples"><span>TRY AN EXAMPLE</span><button type="button" class="example" data-message="Hey, are we still meeting for lunch today?">Normal message</button><button type="button" class="example" data-message="Congratulations! You won a cash prize. Click now to claim your reward!">Possible spam</button></div>
+          <button class="scan-button" type="submit"><span>Analyse message</span><span class="button-arrow">↗</span></button>
+        </form>
+        <p class="privacy-note"><span>◉</span> Demo runs locally on the server. Messages are not saved by this app.</p>
+      </div>
+      <div class="panel result-panel">
+        <div class="panel-head"><div><div class="section-kicker">02 / ANALYSIS</div><h2>Screening report</h2></div><span class="report-tag">LIVE RESULT</span></div>
+        {% if result %}
+          <div class="result-state {{ 'is-spam' if result.label == 'spam' else 'is-ham' }}">
+            <div class="result-symbol">{{ '!' if result.label == 'spam' else '✓' }}</div>
+            <div><div class="result-overline">CLASSIFICATION</div><h3>{{ 'Potential spam detected' if result.label == 'spam' else 'Likely legitimate' }}</h3><p>{{ 'Treat links, payment requests, and requests for personal information with caution.' if result.label == 'spam' else 'The model found more signals associated with a normal message.' }}</p></div>
+          </div>
+          <div class="metric"><div class="metric-top"><span>Prediction confidence</span><strong>{{ result.confidence }}%</strong></div><div class="meter"><span style="width: {{ result.confidence }}%"></span></div></div>
+          <div class="metric"><div class="metric-top"><span>Spam probability</span><strong>{{ result.spam_probability }}%</strong></div><div class="meter spam-meter"><span style="width: {{ result.spam_probability }}%"></span></div></div>
+          <div class="report-grid"><div class="report-cell"><span>RISK INDICATOR</span><strong class="{{ 'risk-high' if result.risk == 'High' else 'risk-low' if result.risk == 'Low' else 'risk-medium' }}">{{ result.risk }}</strong></div><div class="report-cell"><span>WORD COUNT</span><strong>{{ result.words }}</strong></div><div class="report-cell"><span>MODEL</span><strong>Naive Bayes</strong></div><div class="report-cell"><span>FEATURES</span><strong>TF-IDF · 1–2 grams</strong></div></div>
+          <div class="disclaimer">Model output is an estimate, not a guarantee. Verify suspicious senders independently.</div>
+        {% else %}
+          <div class="empty-state"><div class="radar"><span></span><b>✳</b></div><h3>Awaiting your message</h3><p>Your screening report will appear here after you run an analysis.</p><div class="empty-divider"></div><div class="empty-row"><span class="empty-dot"></span> Text pattern analysis <span class="empty-status">READY</span></div><div class="empty-row"><span class="empty-dot"></span> Spam probability estimate <span class="empty-status">READY</span></div><div class="empty-row"><span class="empty-dot"></span> Classification report <span class="empty-status">READY</span></div></div>
+        {% endif %}
+      </div>
+    </section>
+    <section class="how"><div><div class="section-kicker">UNDER THE HOOD</div><h2>Small signals.<br><span>Smarter screening.</span></h2></div><div class="how-copy"><p>Text is converted into weighted word and phrase features with TF-IDF. A Multinomial Naive Bayes classifier estimates whether the message resembles examples labelled spam or ham.</p><div class="process"><div><b>01</b><span>Clean & vectorise</span></div><i>→</i><div><b>02</b><span>Classify patterns</span></div><i>→</i><div><b>03</b><span>Show estimate</span></div></div></div></section>
+    <footer><a class="footer-brand" href="/">SpamShield<span>®</span></a><span>STUDENT ML PROJECT · BUILT WITH PYTHON + FLASK</span><span>USE YOUR JUDGEMENT. STAY SAFE.</span></footer>
+  </main>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body></html>
